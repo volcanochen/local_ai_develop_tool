@@ -306,27 +306,71 @@ function detectCategory(input: string): string {
 
 ## ⚙️ 本地 LLM 对接
 
-### 支持的推理引擎
+### 📍 模型存放位置
 
-| 引擎 | 默认端点 | 推荐模型 |
-|------|---------|---------|
-| **Ollama** | `http://localhost:11434/api` | qwen2.5:7b |
-| **llama.cpp** | `http://localhost:8080` | llama-3-8b |
-| **LocalAI** | `http://localhost:8080/v1` | 自定义 |
-| **自定义** | 用户配置 | 用户配置 |
+| 推理引擎 | 模型存放路径 |
+|---------|-------------|
+| **Ollama** | `~/.ollama/models` (macOS/Linux) 或 `C:\Users\<用户名>\.ollama\models` (Windows) |
+| **llama.cpp** | 自定义路径，推荐 `./models/*.gguf` |
+| **LocalAI** | `~/.local/share/local-ai/models` |
 
-### Ollama 快速配置
+### 🚀 快速部署（推荐）
+
+**一键部署脚本**（自动安装、下载模型、启动服务）：
 
 ```bash
-# 安装 Ollama
+# macOS / Linux
+chmod +x scripts/setup-local-llm.sh
+./scripts/setup-local-llm.sh
+
+# Windows
+scripts\setup-local-llm.bat
+```
+
+**启动本地 LLM 服务**：
+```bash
+chmod +x scripts/start-llm.sh
+./scripts/start-llm.sh          # 默认启动 Ollama
+./scripts/start-llm.sh llama-cpp  # 或启动 llama.cpp
+```
+
+### 支持的推理引擎
+
+| 引擎 | 默认端点 | 推荐模型 | 模型大小 |
+|------|---------|---------|---------|
+| **Ollama** | `http://localhost:11434/api` | qwen2.5:7b | 4.7 GB |
+| **llama.cpp** | `http://localhost:8080` | codellama-7b | 3.8 GB |
+| **LocalAI** | `http://localhost:8080/v1` | 自定义 | 取决于模型 |
+| **自定义** | 用户配置 | 用户配置 | - |
+
+### 手动配置步骤
+
+```bash
+# 1. 安装 Ollama
 curl -fsSL https://ollama.com/install.sh | sh
 
-# 拉取模型
-ollama pull qwen2.5:7b
+# 2. 下载模型（模型会自动保存到 ~/.ollama/models）
+ollama pull qwen2.5:7b        # 推荐，中文能力强
+ollama pull qwen2.5:3b        # 轻量版，适合低配机器
+ollama pull codellama:7b      # 代码专用
 
-# 启动服务（默认监听 localhost:11434）
+# 3. 启动服务（默认监听 localhost:11434）
 ollama serve
+
+# 4. 验证服务
+curl http://localhost:11434/api/tags
 ```
+
+### 推荐模型
+
+| 模型 | 大小 | 特点 | 适用场景 |
+|------|------|------|---------|
+| qwen2.5:7b | 4.7 GB | **中文能力优秀** | 通用需求分析 |
+| qwen2.5:3b | 1.9 GB | 轻量快速 | 低配机器 |
+| codellama:7b | 3.8 GB | 代码生成专用 | 编程任务 |
+| llama3.1:8b | 4.7 GB | 英文能力强 | 英文需求 |
+
+📖 **详细部署文档**：[LOCAL_LLM_DEPLOY.md](./LOCAL_LLM_DEPLOY.md)
 
 ---
 
@@ -350,8 +394,17 @@ VoiceDev/
 ├── index.html                 # 入口 HTML
 ├── package.json               # 依赖管理
 ├── vite.config.js             # Vite 配置
+├── vitest.config.ts           # Vitest 测试配置
 ├── tsconfig.json              # TypeScript 配置
-├── README.md                  # 本文档
+├── README.md                  # 项目主文档
+├── LOCAL_LLM_DEPLOY.md        # 本地模型部署指南
+├── TESTING.md                 # 测试运行指南
+├── TEST_SUMMARY.md            # 测试模块总结
+│
+├── scripts/                   # 部署脚本
+│   ├── setup-local-llm.sh     # 一键部署脚本 (macOS/Linux)
+│   ├── setup-local-llm.bat    # 一键部署脚本 (Windows)
+│   └── start-llm.sh           # 启动 LLM 服务
 │
 └── src/
     ├── main.tsx               # 应用入口
@@ -370,8 +423,17 @@ VoiceDev/
     ├── hooks/
     │   └── useSpeechRecognition.ts  # 语音识别 Hook
     │
-    └── utils/
-        └── planGenerator.ts   # 计划生成引擎
+    ├── services/              # 服务层
+    │   ├── llmService.ts      # 本地 LLM 调用服务
+    │   └── prompts.ts         # Prompt 模板管理
+    │
+    ├── utils/
+    │   └── planGenerator.ts   # 计划生成引擎
+    │
+    └── test/
+        ├── setup.ts           # 测试环境配置
+        ├── global.d.ts        # 全局类型声明
+        └── vitest-env.d.ts    # Vitest 环境类型
 ```
 
 ---
