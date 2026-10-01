@@ -13,6 +13,7 @@ const mockPlan: ExecutionPlan = {
       id: 'task-1',
       title: '第一个任务',
       description: '任务描述1',
+      type: 'analysis',
       status: 'pending',
       progress: 0,
       dependencies: [],
@@ -22,6 +23,7 @@ const mockPlan: ExecutionPlan = {
       id: 'task-2',
       title: '第二个任务',
       description: '任务描述2',
+      type: 'code',
       status: 'pending',
       progress: 0,
       dependencies: ['task-1'],
@@ -185,7 +187,16 @@ describe('ExecutionPlanView', () => {
     const completedPlan = {
       ...mockPlan,
       tasks: [
-        { ...mockPlan.tasks[0], status: 'completed' as const, progress: 100, output: '任务完成输出' },
+        { 
+          ...mockPlan.tasks[0], 
+          status: 'completed' as const, 
+          progress: 100, 
+          output: {
+            type: 'code' as const,
+            title: '任务完成输出',
+            content: 'console.log("done")',
+          }
+        },
         mockPlan.tasks[1],
       ],
     };

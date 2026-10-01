@@ -1,6 +1,7 @@
 import React from 'react';
 import { CheckCircle, Clock, Play, AlertCircle, Loader2, ArrowRight, GitBranch } from 'lucide-react';
 import { ExecutionPlan as PlanType, Task } from '../types';
+import TaskOutputView from './TaskOutputView';
 
 interface ExecutionPlanProps {
   plan: PlanType;
@@ -104,11 +105,7 @@ export default function ExecutionPlanView({ plan, onExecute, onApprove }: Execut
                 )}
 
                 {/* Output */}
-                {task.output && (
-                  <div className="mt-2 p-2 bg-green-900/20 rounded-lg border border-green-700/30">
-                    <p className="text-xs text-green-300">{task.output}</p>
-                  </div>
-                )}
+                {task.output && <TaskOutputView output={task.output} />}
 
                 {/* Dependencies */}
                 {task.dependencies.length > 0 && (
