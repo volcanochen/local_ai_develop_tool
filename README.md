@@ -376,6 +376,230 @@ VoiceDev/
 
 ---
 
+## 🧪 测试体系
+
+### 测试框架
+
+| 工具 | 用途 |
+|------|------|
+| **Vitest** | 测试运行器（与 Vite 深度集成） |
+| **Testing Library** | React 组件测试 |
+| **jsdom** | DOM 环境模拟 |
+| **@vitest/coverage-v8** | 代码覆盖率 |
+
+### 运行测试
+
+```bash
+# 运行所有测试
+npm test
+
+# 监听模式（开发时使用）
+npm run test:watch
+
+# 生成覆盖率报告
+npm run test:coverage
+
+# 运行特定测试文件
+npx vitest src/utils/planGenerator.test.ts
+```
+
+### 测试文件结构
+
+```
+src/
+├── App.test.tsx                      # 集成测试
+├── utils/
+│   └── planGenerator.test.ts         # 核心业务逻辑测试
+├── hooks/
+│   └── useSpeechRecognition.test.ts  # Hook 测试
+└── components/
+    ├── VoiceInput.test.tsx           # 语音输入组件测试
+    ├── ExecutionPlanView.test.tsx    # 执行计划组件测试
+    ├── SettingsPanel.test.tsx        # 设置面板组件测试
+    ├── Sidebar.test.tsx              # 侧边栏组件测试
+    ├── ActivityLog.test.tsx          # 日志组件测试
+    └── DashboardStats.test.tsx       # 统计面板组件测试
+```
+
+### 测试用例说明
+
+#### 1. 核心业务逻辑测试 (`planGenerator.test.ts`)
+
+**意图识别测试**：
+- ✅ 包含"网站/应用/系统"等关键词 → 识别为 Web 应用
+- ✅ 包含"数据/分析/报表"等关键词 → 识别为数据分析
+- ✅ 包含"自动/脚本/定时"等关键词 → 识别为自动化脚本
+- ✅ 无法识别 → 使用默认模板
+
+**计划生成测试**：
+- ✅ 生成包含所有必需字段的执行计划
+- ✅ 任务数量符合模板定义
+- ✅ 每个任务有唯一 ID
+- ✅ 包含定制任务
+- ✅ 任务依赖关系正确
+
+**任务执行测试**：
+- ✅ 按顺序执行所有任务
+- ✅ 调用进度回调
+- ✅ 完成后所有任务有输出
+- ✅ 完成后进度为 100%
+
+#### 2. Hook 测试 (`useSpeechRecognition.test.ts`)
+
+- ✅ 返回初始状态
+- ✅ 提供 startListening/stopListening 方法
+- ✅ 提供 clearTranscript/setTranscript 方法
+- ✅ 调用 startListening 设置 isListening 为 true
+- ✅ 调用 stopListening 设置 isListening 为 false
+- ✅ 调用 clearTranscript 清空所有文本
+- ✅ 检测浏览器是否支持语音识别
+
+#### 3. 组件测试
+
+**VoiceInput 组件**：
+- ✅ 渲染录音按钮、手动输入按钮、生成按钮
+- ✅ 点击手动输入显示文本框
+- ✅ 无输入时生成按钮禁用
+- ✅ 有输入时生成按钮可用
+- ✅ 点击生成调用 onSubmit
+
+**ExecutionPlanView 组件**：
+- ✅ 渲染计划标题和描述
+- ✅ 渲染所有任务
+- ✅ 显示任务数量和进度
+- ✅ 草稿状态显示批准和执行按钮
+- ✅ 点击按钮调用对应回调
+- ✅ running 状态显示进度条
+- ✅ completed 状态显示输出
+
+**SettingsPanel 组件**：
+- ✅ 渲染 LLM 配置和隐私安全标签
+- ✅ 切换标签显示对应面板
+- ✅ 显示所有推理引擎选项
+- ✅ 点击引擎调用 onLLMConfigChange
+- ✅ 修改配置调用回调
+- ✅ 隐私面板显示安全等级
+
+**Sidebar 组件**：
+- ✅ 渲染应用名称和导航项
+- ✅ 显示计划数量徽章
+- ✅ 点击导航调用 onViewChange
+- ✅ 高亮当前活动视图
+- ✅ 显示执行状态和系统状态
+
+**ActivityLog 组件**：
+- ✅ 渲染标题和日志数量
+- ✅ 渲染所有日志消息
+- ✅ 空日志显示提示
+- ✅ 显示时间戳
+
+**DashboardStats 组件**：
+- ✅ 渲染 4 个统计卡片
+- ✅ 正确显示数值和标签
+- ✅ 支持 0 值和大数值
+
+#### 4. 集成测试 (`App.test.tsx`)
+
+- ✅ 渲染主应用
+- ✅ 显示控制台视图
+- ✅ 显示系统架构
+- ✅ 显示统计卡片
+- ✅ 侧边栏导航切换视图
+- ✅ 显示安全状态指示器
+- ✅ 各视图包含对应组件
+- ✅ 显示初始日志
+
+### 测试覆盖范围
+
+| 模块 | 测试类型 | 用例数 |
+|------|---------|--------|
+| planGenerator | 单元测试 | 20+ |
+| useSpeechRecognition | Hook 测试 | 10+ |
+| VoiceInput | 组件测试 | 8+ |
+| ExecutionPlanView | 组件测试 | 12+ |
+| SettingsPanel | 组件测试 | 12+ |
+| Sidebar | 组件测试 | 11+ |
+| ActivityLog | 组件测试 | 6+ |
+| DashboardStats | 组件测试 | 6+ |
+| App | 集成测试 | 10+ |
+| **总计** | - | **95+** |
+
+### 新功能测试流程
+
+**每次实现新功能后，按以下步骤测试**：
+
+1. **编写测试用例**
+   ```bash
+   # 在对应模块目录下创建 .test.ts 或 .test.tsx 文件
+   # 例如：src/utils/newFeature.test.ts
+   ```
+
+2. **运行测试**
+   ```bash
+   # 运行所有测试
+   npm test
+   
+   # 或只运行新功能的测试
+   npx vitest src/utils/newFeature.test.ts
+   ```
+
+3. **检查覆盖率**
+   ```bash
+   npm run test:coverage
+   # 查看 html 报告：coverage/index.html
+   ```
+
+4. **确保所有测试通过**
+   - ✅ 新增功能测试通过
+   - ✅ 现有测试不受影响
+   - ✅ 覆盖率不低于 80%
+
+5. **提交代码**
+   ```bash
+   git add .
+   git commit -m "feat: 新功能描述
+   
+   - 实现功能 X
+   - 添加测试用例 Y 个
+   - 测试覆盖率 Z%"
+   ```
+
+### 测试最佳实践
+
+1. **测试命名规范**
+   ```typescript
+   it('应该[预期行为]当[条件]', () => {
+     // 测试代码
+   });
+   ```
+
+2. **AAA 模式**
+   ```typescript
+   it('应该正确计算总数', () => {
+     // Arrange - 准备
+     const plan = generatePlan('测试');
+     
+     // Act - 执行
+     const result = plan.tasks.length;
+     
+     // Assert - 断言
+     expect(result).toBeGreaterThan(0);
+   });
+   ```
+
+3. **隔离测试**
+   - 每个测试独立运行
+   - 使用 `beforeEach` 清理状态
+   - Mock 外部依赖
+
+4. **测试边界情况**
+   - 空值
+   - 极端值
+   - 错误输入
+   - 异常状态
+
+---
+
 ## 🔮 未来规划
 
 - [ ] 对接真实 LLM API（Ollama / llama.cpp HTTP 接口）
@@ -386,6 +610,8 @@ VoiceDev/
 - [ ] Git 自动提交与版本管理
 - [ ] 语音指令扩展（暂停、取消、重试等）
 - [ ] 插件系统（可扩展执行器）
+- [ ] 测试覆盖率提升到 90%+
+- [ ] E2E 测试（Playwright/Cypress）
 
 ---
 
