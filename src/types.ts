@@ -2,11 +2,21 @@ export interface Task {
   id: string;
   title: string;
   description: string;
+  type: 'code' | 'document' | 'config' | 'test' | 'deploy' | 'analysis' | 'design';
   status: 'pending' | 'running' | 'completed' | 'failed';
   progress: number;
   dependencies: string[];
   estimatedTime: string;
-  output?: string;
+  output?: TaskOutput;
+}
+
+export interface TaskOutput {
+  type: 'code' | 'document' | 'config' | 'test-report' | 'deploy-log' | 'analysis' | 'design';
+  title: string;
+  content: string;
+  language?: string; // for code
+  files?: Array<{ name: string; content: string }>;
+  logs?: string[];
 }
 
 export interface ExecutionPlan {
